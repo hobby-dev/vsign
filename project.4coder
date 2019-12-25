@@ -1,0 +1,50 @@
+version(1);
+
+project_name = "vsign";
+
+patterns = {
+"*.c",
+"*.cpp",
+"*.h",
+"*.md",
+"*.bat",
+"*.sh",
+"*.4coder",
+"*.txt",
+};
+
+blacklist_patterns = {
+".*",
+"_out",
+};
+
+load_paths_base = {
+ { ".", .relative = true, .recursive = true, },
+};
+
+load_paths = {
+ { load_paths_base, .os = "win", },
+ { load_paths_base, .os = "linux", },
+ { load_paths_base, .os = "mac", },
+};
+
+command_list = {
+ { .name = "build",
+   .save_dirty_files = true,
+   .out="*build*",
+   .footer_panel = true,
+   .cursor_at_end = true,
+   .cmd = { { "build.bat" , .os = "win"   },
+            { "./build_debug.sh", .os = "linux" },
+            { "./build_debug.sh", .os = "mac"   }, }, },
+ { .name = "run",
+   .out="*run*",
+   .footer_panel = true,
+   .cursor_at_end = true,
+   .cmd = { { ".\\build\\vsign", .os = "win"   },
+            { "./build/vsign /home/user/Downloads/ubuntu-18.04-amd64-dell_X00.iso out_1 -v", .os = "linux" },
+            { "./build/vsign" , .os = "mac"   }, }, },
+};
+
+fkey_command[1] = "build";
+fkey_command[2] = "run";
