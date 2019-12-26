@@ -65,8 +65,10 @@ Settings parse_arguments(int argc, char **argv) {
     if (current_arg[0] == '-') {
       if (!strcmp(current_arg, "-v"))
         settings.verbose = 1;
-      else if (!strcmp(current_arg, "-y"))
+      else if (!strcmp(current_arg, "-y")) {
+	REPORT_ERROR_AND_EXIT("Verification is not implemented yet");
         settings.verify = 1;
+      }
       else if (!strcmp(current_arg, "-b"))
         settings.block_size = std::strtoull(argv[++count], nullptr, 0);
       else if (!strcmp(current_arg, "-t"))
