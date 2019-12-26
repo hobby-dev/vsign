@@ -12,7 +12,7 @@
 // Cross-platform memory mapping:
 #include "portable-memory-mapping/MemoryMapped.h"
 
-#define ERROR(user_description)                                                \
+#define REPORT_ERROR_AND_EXIT(user_description)                                \
   do {                                                                         \
     std::cerr << user_description << "\n";                                     \
     exit(EXIT_FAILURE);                                                        \
@@ -74,25 +74,27 @@ Settings parse_arguments(int argc, char **argv) {
       else if (!strcmp(current_arg, "-h"))
         print_help_and_exit();
       else
-        ERROR("Wrong argument: " << current_arg << USAGE_TEXT);
+        REPORT_ERROR_AND_EXIT("Wrong argument: " << current_arg << USAGE_TEXT);
     } else {
       if (settings.input == nullptr) {
         settings.input = current_arg;
       } else if (settings.output == nullptr) {
         settings.output = current_arg;
       } else {
-        ERROR("What do you mean by this argument?\n"
-              << current_arg
-              << "\ninput file already defined as: " << settings.input
-              << "\nand output file already defined as: " << settings.output
-              << USAGE_TEXT);
+        REPORT_ERROR_AND_EXIT(
+            "What do you mean by this argument?\n"
+            << current_arg
+            << "\ninput file already defined as: " << settings.input
+            << "\nand output file already defined as: " << settings.output
+            << USAGE_TEXT);
       }
     }
   }
 
   // Verify that settings are correct:
   if (settings.input == nullptr) {
-    ERROR("Missing required argument: input file name\n" << USAGE_TEXT);
+    REPORT_ERROR_AND_EXIT("Missing required argument: input file name\n"
+                          << USAGE_TEXT);
   } else if (settings.output == nullptr) {
     static std::string output_name{settings.input};
     output_name += ".signature";
@@ -101,10 +103,11 @@ Settings parse_arguments(int argc, char **argv) {
 
   constexpr size_t MIN_BLOCK_SIZE = sizeof(meow_u128);
   if (settings.block_size < MIN_BLOCK_SIZE) {
-    ERROR("You've set block size (-b) to "
-          << settings.block_size << " bytes but minimal block size is "
-          << MIN_BLOCK_SIZE << " bytes\n"
-          << USAGE_TEXT);
+    REPORT_ERROR_AND_EXIT("You've set block size (-b) to "
+                          << settings.block_size
+                          << " bytes but minimal block size is "
+                          << MIN_BLOCK_SIZE << " bytes\n"
+                          << USAGE_TEXT);
   }
   return settings;
 }
@@ -118,8 +121,9 @@ void execute_worker(
     int last_block_size = input->size() % block_size;
     const size_t last_position =
         input->size() / block_size - (last_block_size ? 0 : 1);
-    if (last_block_size == 0)
+    if (last_block_size == 0) {
       last_block_size = block_size;
+    }
 
     // get raw pointers to data
     uint8_t *in_mem_begin = static_cast<uint8_t *>(input->accessData());
@@ -167,9 +171,11 @@ void run(const Settings &settings) {
   // Init input
   auto input = std::make_shared<MemoryMapped>();
   bool ok = input->open_read(settings.input);
-  if (!ok)
-    ERROR("Can't map input file " << settings.input << " into memory: " << errno
-                                  << " " << strerror(errno));
+  if (!ok) {
+    REPORT_ERROR_AND_EXIT("Can't map input file " << settings.input
+                                                  << " into memory");
+  }
+
   // Init output
   const size_t last_block_size =
       input->size() % settings.block_size > 0 ? sizeof(meow_u128) : 0;
@@ -179,9 +185,10 @@ void run(const Settings &settings) {
 
   auto output = std::make_shared<MemoryMapped>();
   ok = output->open_write(settings.output, output_size);
-  if (!ok)
-    ERROR("Can't map output file " << settings.output << " into memory: "
-                                   << errno << " " << strerror(errno));
+  if (!ok) {
+    REPORT_ERROR_AND_EXIT("Can't map output file " << settings.output
+                                                   << " into memory");
+  }
 
   // start workers
   std::vector<std::thread> threads;
@@ -193,11 +200,13 @@ void run(const Settings &settings) {
       threads.emplace_back(execute_worker, total_blocks_read,
                            settings.block_size, input, output);
     } catch (const std::system_error &error) {
-      if (settings.verbose)
+      if (settings.verbose) {
         std::cout << "Couldn't create thread: " << error.what() << "\n";
+      }
       ++failed_threads;
-      if (failed_threads < threads_to_create)
+      if (failed_threads < threads_to_create) {
         --i; // retry for some time, but not infinitely
+      }
     }
   }
 
@@ -205,8 +214,9 @@ void run(const Settings &settings) {
   execute_worker(total_blocks_read, settings.block_size, input, output);
 
   // Wait for completion of all threads
-  for (std::thread &thread : threads)
+  for (std::thread &thread : threads) {
     thread.join();
+  }
 }
 } // namespace vsign
 
@@ -220,8 +230,9 @@ int main(int argc, char **argv) {
     auto duration = std::chrono::system_clock::now() - start_time;
     auto duration_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-    if (settings.verbose)
+    if (settings.verbose) {
       std::cout << "Completed in " << duration_ms.count() << " milliseconds\n";
+    }
   } catch (const std::exception &error) {
     printf("Sorry, something went wrong: %s\n", error.what());
   } catch (...) {

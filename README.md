@@ -5,14 +5,22 @@ Code is as simple and fast as I can manage so far.
 Using Meow Hash (https://github.com/cmuratori/meow_hash) - 
 the best hash that I could find for this particual type of work.
 
-## Prerequisites:
+## Prerequisites
 
-Windows or Linux
 x86-64 C++14 compiler
 
-## Building:
+## Building
 
-Run build.bat (Windows) or build.sh (Linux)
+### Windows (using Visual Studio)
+
+ - make sure you have relevant Windows SDK installed
+ - run `cmd` in vsign dir
+ - run `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat` or equivalent for your Visual Studio version
+ - run `build.bat`
+
+### Linux (using clang++)
+
+ - run `build.sh`
 
 ## Usage:
 
@@ -23,13 +31,13 @@ TODO: usage examples
 
 ## Known issues:
 
+Check [github issues page](https://github.com/ivan-cx/vsign/issues).
 Please, report any issues you find.
 
 ## Plan:
 
 Project:
  * [ ] Generate test file (must be 4Gb+)
- * [ ] build.bat for windows
  * [ ] Documentation in README.md
 
 Consider:
@@ -38,7 +46,6 @@ Consider:
 
 Code:
  * [ ] handle out of disk space?
- * [ ] compile on Windows
  * [ ] Optimization: 2 threads per core to utilize cache?
  * [ ] Optimization: mtune=native?
 
@@ -83,3 +90,5 @@ Done:
  * [ ] what are other exception places? - who knows? any std::stuff potentially could throw. Installed general execption handlers.
  * [x] Smart pointers for resources
  * [x] push to github
+ * [x] build.bat for windows
+ * [x] compile on Windows
