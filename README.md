@@ -1,8 +1,8 @@
 # vsign
 
-Creates binary "signature" of contents of files. 
+Creates binary signature of file contents. 
 Works as fast as your storage. 
-[Uses Meow Hash](https://github.com/cmuratori/meow_hash) - 
+Uses [Meow Hash](https://github.com/cmuratori/meow_hash) - 
 the best hash that I could find for this particual type of work.
 
 ## Prerequisites
