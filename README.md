@@ -46,6 +46,7 @@ Options:
 
 ## Known issues:
 
-Check [github issues page](https://github.com/ivan-cx/vsign/issues).
-Please, report any issues you find.
-
+ - Currently there is no clear error message for "out of disk space" situation
+ - Add tests
+ - Implement verify feature (-y)
+ - [Windows] no error message when lack permisiion to create signature file
